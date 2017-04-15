@@ -29,6 +29,7 @@ from UaStateGeneric import UaStateGeneric
 from SipAddress import SipAddress
 from SipRoute import SipRoute
 
+
 class UacStateCancelling(UaStateGeneric):
     sname = 'Cancelling(UAC)'
 
@@ -42,7 +43,7 @@ class UacStateCancelling(UaStateGeneric):
         self.te = Timeout(self.goIdle, 300.0)
 
     def goIdle(self):
-        #print 'Time in Cancelling state expired, going to the Dead state'
+        # print 'Time in Cancelling state expired, going to the Dead state'
         self.te = None
         self.ua.changeState((UaStateDead,))
 
@@ -75,11 +76,11 @@ class UacStateCancelling(UaStateGeneric):
             self.ua.routes.reverse()
             if len(self.ua.routes) > 0:
                 if not self.ua.routes[0].getUrl().lr:
-                    self.ua.routes.append(SipRoute(address = SipAddress(url = self.ua.rTarget)))
+                    self.ua.routes.append(SipRoute(address=SipAddress(url=self.ua.rTarget)))
                     self.ua.rTarget = self.ua.routes.pop(0).getUrl()
                     self.ua.rAddr = self.ua.rTarget.getAddr()
                 elif self.ua.outbound_proxy != None:
-                    self.ua.routes.append(SipRoute(address = SipAddress(url = self.ua.rTarget)))
+                    self.ua.routes.append(SipRoute(address=SipAddress(url=self.ua.rTarget)))
                     self.ua.rTarget = self.ua.routes[0].getUrl().getCopy()
                     self.ua.rTarget.lr = False
                     self.ua.rTarget.other = tuple()
@@ -92,13 +93,15 @@ class UacStateCancelling(UaStateGeneric):
             req = self.ua.genRequest('BYE')
             self.ua.lCSeq += 1
             self.ua.global_config['_sip_tm'].newTransaction(req, \
-              laddress = self.ua.source_address, compact = self.ua.compact_sip)
+                                                            laddress=self.ua.source_address,
+                                                            compact=self.ua.compact_sip)
             return (UaStateDisconnected,)
         return (UaStateDead,)
 
     def recvEvent(self, event):
-        #print 'wrong event %s in the Cancelling state' % event
+        # print 'wrong event %s in the Cancelling state' % event
         return None
+
 
 if not globals().has_key('UaStateDead'):
     from UaStateDead import UaStateDead

@@ -26,6 +26,7 @@
 
 from socket import gethostbyname, gethostname
 
+
 class MyAddress(object):
     my = True
 
@@ -34,6 +35,7 @@ class MyAddress(object):
             return gethostbyname(gethostname())
         except:
             return '127.0.0.1'
+
 
 class MyPort(object):
     my = True
@@ -48,17 +50,26 @@ class MyPort(object):
     def __int__(self):
         return self.default_port
 
+
 class SipConf(object):
     default_port = 5060
 
-    try: my_address
-    except: my_address = MyAddress()
+    try:
+        my_address
+    except:
+        my_address = MyAddress()
 
-    try: my_port
-    except: my_port = MyPort(default_port)
+    try:
+        my_port
+    except:
+        my_port = MyPort(default_port)
 
-    try: my_uaname
-    except: my_uaname = 'Sippy'
+    try:
+        my_uaname
+    except:
+        my_uaname = 'Sippy'
 
-    try: allow_formats
-    except: allow_formats = None
+    try:
+        allow_formats
+    except:
+        allow_formats = None

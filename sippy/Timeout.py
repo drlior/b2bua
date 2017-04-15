@@ -30,6 +30,7 @@ from traceback import print_exc, format_list, extract_stack
 from sys import stdout
 from random import random
 
+
 class TimeoutInact(object):
     _task = None
     _interval = None
@@ -38,8 +39,8 @@ class TimeoutInact(object):
     _timeout_cb_args = None
     _randomize_runs = None
 
-    def __init__(self, timeout_callback, interval, ticks = 1, *callback_arguments):
-        #print('TimeoutInact.__init__(%s)' % (str(callback_arguments),))
+    def __init__(self, timeout_callback, interval, ticks=1, *callback_arguments):
+        # print('TimeoutInact.__init__(%s)' % (str(callback_arguments),))
         self._timeout_callback = timeout_callback
         self._interval = interval
         self._ticks_left = ticks
@@ -71,7 +72,7 @@ class TimeoutInact(object):
         else:
             ival = self._randomize_runs(self._interval)
         self._task = reactor.callLater(ival, self._run_once, \
-          *self._timeout_cb_args)
+                                       *self._timeout_cb_args)
 
     def _run(self, *callback_arguments):
         try:
@@ -79,7 +80,7 @@ class TimeoutInact(object):
         except:
             print datetime.now(), 'Timeout: unhandled exception in timeout callback'
             print '-' * 70
-            print_exc(file = stdout)
+            print_exc(file=stdout)
             print '-' * 70
             stdout.flush()
         if self._ticks_left == 1:
@@ -94,7 +95,7 @@ class TimeoutInact(object):
         except:
             print datetime.now(), 'Timeout: unhandled exception in timeout callback'
             print '-' * 70
-            print_exc(file = stdout)
+            print_exc(file=stdout)
             print '-' * 70
             stdout.flush()
         self._ticks_left -= 1
@@ -120,10 +121,12 @@ class TimeoutInact(object):
         self._timeout_callback = None
         self._timeout_cb_args = None
 
+
 class Timeout(TimeoutInact):
     def __init__(self, *args):
         TimeoutInact.__init__(self, *args)
         self.go()
+
 
 class TimeoutAbs:
     _task = None
@@ -142,7 +145,7 @@ class TimeoutAbs:
         except:
             print datetime.now(), 'Timeout: unhandled exception in timeout callback'
             print '-' * 70
-            print_exc(file = stdout)
+            print_exc(file=stdout)
             print '-' * 70
             stdout.flush()
         self._task = None
@@ -152,6 +155,7 @@ class TimeoutAbs:
         self._task.cancel()
         self._task = None
         self._timeout_callback = None
+
 
 class Timeout_debug(Timeout):
     _traceback = None
@@ -165,36 +169,40 @@ class Timeout_debug(Timeout):
             print self._traceback
         Timeout.cancel(self)
 
+
 if __name__ == '__main__':
     from twisted.internet import reactor
-    
+
+
     def test1(arguments, testnum):
         print testnum
         arguments['test'] = True
         reactor.crash()
+
 
     def test2(arguments, testnum):
         print testnum
         arguments['test'] = 'bar'
         reactor.crash()
 
-    arguments = {'test':False}
+
+    arguments = {'test': False}
     timeout_1 = Timeout(test1, 0, 1, arguments, 'test1')
     reactor.run()
-    assert(arguments['test'])
+    assert (arguments['test'])
     timeout_1 = Timeout(test1, 0.1, 1, arguments, 'test2')
     timeout_2 = Timeout(test2, 0.2, 1, arguments, 'test3')
     timeout_1.cancel()
     reactor.run()
-    assert(arguments['test'] == 'bar')
+    assert (arguments['test'] == 'bar')
 
-    arguments = {'test':False}
+    arguments = {'test': False}
     timeout_1 = TimeoutAbs(test1, reactor.seconds(), arguments, 'test4')
     reactor.run()
-    assert(arguments['test'])
+    assert (arguments['test'])
 
     timeout_1 = TimeoutAbs(test1, reactor.seconds() + 0.1, arguments, 'test5')
     timeout_2 = TimeoutAbs(test2, reactor.seconds() + 0.2, arguments, 'test6')
     timeout_1.cancel()
     reactor.run()
-    assert(arguments['test'] == 'bar')
+    assert (arguments['test'] == 'bar')

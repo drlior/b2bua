@@ -28,6 +28,7 @@
 from twisted.internet.protocol import Protocol
 import sys, traceback
 
+
 class Cli_session(Protocol):
     command_cb = None
     rbuffer = None
@@ -40,12 +41,12 @@ class Cli_session(Protocol):
         self.rbuffer = ''
         self.wbuffer = ''
 
-    #def connectionMade(self):
+    # def connectionMade(self):
     #    print self.transport.getPeer()
     #    self.transport.loseConnection()
 
     def dataReceived(self, data):
-	#print 'Cli_session::dataReceived', self, data
+        # print 'Cli_session::dataReceived', self, data
         if len(data) == 0:
             return
         self.rbuffer += data
@@ -68,7 +69,7 @@ class Cli_session(Protocol):
                 except:
                     print 'Cli_session: unhandled exception when processing incoming data'
                     print '-' * 70
-                    traceback.print_exc(file = sys.stdout)
+                    traceback.print_exc(file=sys.stdout)
                     print '-' * 70
 
     def done(self):

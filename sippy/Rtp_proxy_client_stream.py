@@ -41,6 +41,7 @@ import sys, traceback
 
 _MAX_RECURSE = 10
 
+
 class _RTPPLWorker(Thread):
     userv = None
 
@@ -55,10 +56,10 @@ class _RTPPLWorker(Thread):
         self.s = socket.socket(self.userv.family, socket.SOCK_STREAM)
         self.s.connect(self.userv.address)
 
-    def send_raw(self, command, _recurse = 0, stime = None):
+    def send_raw(self, command, _recurse=0, stime=None):
         if _recurse > _MAX_RECURSE:
             raise Exception('Cannot reconnect: %s' % (str(self.userv.address),))
-        #print('%s.send_raw(%s)' % (id(self), command))
+        # print('%s.send_raw(%s)' % (id(self), command))
         if stime == None:
             stime = MonoTime()
         while True:
@@ -122,9 +123,10 @@ class _RTPPLWorker(Thread):
         except:
             print(datetime.now(), 'Rtp_proxy_client_stream: unhandled exception when processing RTPproxy reply')
             print('-' * 70)
-            traceback.print_exc(file = sys.stdout)
+            traceback.print_exc(file=sys.stdout)
             print('-' * 70)
             sys.stdout.flush()
+
 
 class Rtp_proxy_client_stream(Rtp_proxy_client_net):
     is_local = None
@@ -137,8 +139,8 @@ class Rtp_proxy_client_stream(Rtp_proxy_client_net):
     family = None
     sock_type = socket.SOCK_STREAM
 
-    def __init__(self, global_config, address = '/var/run/rtpproxy.sock', \
-      bind_address = None, nworkers = 1, family = socket.AF_UNIX):
+    def __init__(self, global_config, address='/var/run/rtpproxy.sock', \
+                 bind_address=None, nworkers=1, family=socket.AF_UNIX):
         if family == socket.AF_UNIX:
             self.is_local = True
             self.address = address
@@ -158,7 +160,7 @@ class Rtp_proxy_client_stream(Rtp_proxy_client_net):
         self.nworkers_act = i + 1
         self.delay_flt = recfilter(0.95, 0.25)
 
-    def send_command(self, command, result_callback = None, *callback_parameters):
+    def send_command(self, command, result_callback=None, *callback_parameters):
         if self.nworkers_act == 0:
             self.rtpp_class._reconnect(self, self.address)
         if isinstance(command, Rtp_proxy_cmd):
@@ -170,12 +172,12 @@ class Rtp_proxy_client_stream(Rtp_proxy_client_net):
         self.wi_available.notify()
         self.wi_available.release()
 
-    def reconnect(self, address, bind_address = None):
+    def reconnect(self, address, bind_address=None):
         if not self.is_local:
             address = self.getdestbyaddr(address, family)
         self.rtpp_class._reconnect(self, address, bind_address)
 
-    def _reconnect(self, address, bind_address = None):
+    def _reconnect(self, address, bind_address=None):
         Rtp_proxy_client_stream.shutdown(self)
         self.address = address
         self.workers = []
@@ -202,12 +204,17 @@ class Rtp_proxy_client_stream(Rtp_proxy_client_net):
     def get_rtpc_delay(self):
         return self.delay_flt.lastval
 
+
 if __name__ == '__main__':
     from twisted.internet import reactor
+
+
     def display(*args):
         print(args)
         reactor.crash()
-    r = Rtp_proxy_client_stream({'_sip_address':'1.2.3.4'})
+
+
+    r = Rtp_proxy_client_stream({'_sip_address': '1.2.3.4'})
     r.send_command('VF 123456', display, 'abcd')
-    reactor.run(installSignalHandlers = 1)
+    reactor.run(installSignalHandlers=1)
     r.shutdown()

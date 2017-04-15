@@ -26,5 +26,6 @@
 
 from SipAddressHF import SipAddressHF
 
+
 class SipAlso(SipAddressHF):
     hf_names = ('also',)

@@ -26,6 +26,7 @@
 
 from time import time
 
+
 class CCEventGeneric(object):
     data = None
     name = None
@@ -35,7 +36,7 @@ class CCEventGeneric(object):
     extra_headers = None
     seq = 1
 
-    def __init__(self, data = None, rtime = None, origin = None):
+    def __init__(self, data=None, rtime=None, origin=None):
         self.data = data
         if rtime == None:
             self.rtime = time()
@@ -59,6 +60,7 @@ class CCEventGeneric(object):
     def __str__(self):
         return self.name
 
+
 class CCEventTry(CCEventGeneric):
     name = 'CCEventTry'
     max_forwards = None
@@ -68,17 +70,21 @@ class CCEventTry(CCEventGeneric):
         cself.max_forwards = self.max_forwards
         return cself
 
+
 class CCEventRing(CCEventGeneric):
     name = 'CCEventRing'
     pass
+
 
 class CCEventPreConnect(CCEventGeneric):
     name = 'CCEventPreConnect'
     pass
 
+
 class CCEventConnect(CCEventGeneric):
     name = 'CCEventConnect'
     pass
+
 
 class CCEventUpdate(CCEventGeneric):
     name = 'CCEventUpdate'
@@ -89,16 +95,20 @@ class CCEventUpdate(CCEventGeneric):
         cself.max_forwards = self.max_forwards
         return cself
 
+
 class CCEventInfo(CCEventGeneric):
     name = 'CCEventInfo'
     pass
+
 
 class CCEventDisconnect(CCEventGeneric):
     name = 'CCEventDisconnect'
     pass
 
+
 from SipHeader import SipHeader
 from SipWarning import SipWarning
+
 
 class CCEventFail(CCEventGeneric):
     name = 'CCEventFail'
@@ -112,7 +122,8 @@ class CCEventFail(CCEventGeneric):
         return cself
 
     def setWarning(self, eistr):
-        self.warning = SipHeader(body = SipWarning(text = eistr))
+        self.warning = SipHeader(body=SipWarning(text=eistr))
+
 
 class CCEventRedirect(CCEventGeneric):
     name = 'CCEventRedirect'

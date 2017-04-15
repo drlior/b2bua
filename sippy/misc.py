@@ -28,7 +28,8 @@
 
 import os, sys
 
-def daemonize(logfile = None):
+
+def daemonize(logfile=None):
     # Fork once
     if os.fork() != 0:
         os._exit(0)

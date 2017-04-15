@@ -27,8 +27,10 @@
 class MTAudio(object):
     pass
 
+
 class MTOther(object):
     pass
+
 
 class SdpMedia(object):
     type = None
@@ -37,7 +39,7 @@ class SdpMedia(object):
     transport = None
     formats = None
 
-    def __init__(self, body = None, cself = None):
+    def __init__(self, body=None, cself=None):
         if body != None:
             params = body.split()
             self.stype = params[0]
@@ -68,8 +70,8 @@ class SdpMedia(object):
                 rval += ' %s' % format
         return rval
 
-    def localStr(self, local_addr = None, local_port = None):
+    def localStr(self, local_addr=None, local_port=None):
         return str(self)
 
     def getCopy(self):
-        return SdpMedia(cself = self)
+        return SdpMedia(cself=self)

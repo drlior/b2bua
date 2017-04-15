@@ -32,14 +32,15 @@ from SipAddress import SipAddress
 from SipURL import SipURL
 from SipConf import SipConf
 
+
 class SipFrom(SipAddressHF):
     hf_names = ('from', 'f')
     relaxedparser = True
 
-    def __init__(self, body = None, address = None):
+    def __init__(self, body=None, address=None):
         SipAddressHF.__init__(self, body, address)
         if body == None and address == None:
-            self.address = SipAddress(name = 'Anonymous', url = SipURL(host = SipConf.my_address, port = SipConf.my_port))
+            self.address = SipAddress(name='Anonymous', url=SipURL(host=SipConf.my_address, port=SipConf.my_port))
 
     def getTag(self):
         return self.address.getParam('tag')
@@ -53,7 +54,7 @@ class SipFrom(SipAddressHF):
     def delTag(self):
         self.address.delParam('tag')
 
-    def getCanName(self, name, compact = False):
+    def getCanName(self, name, compact=False):
         if compact:
             return 'f'
         return 'From'

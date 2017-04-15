@@ -30,6 +30,7 @@ from datetime import datetime
 from traceback import print_exc
 from sys import stdout
 
+
 class Signal(object):
     callback = None
     parameters = None
@@ -49,7 +50,7 @@ class Signal(object):
             except:
                 print datetime.now(), 'Signal: unhandled exception in signal chain'
                 print '-' * 70
-                print_exc(file = stdout)
+                print_exc(file=stdout)
                 print '-' * 70
                 stdout.flush()
 
@@ -59,7 +60,7 @@ class Signal(object):
         except:
             print datetime.now(), 'Signal: unhandled exception in signal callback'
             print '-' * 70
-            print_exc(file = stdout)
+            print_exc(file=stdout)
             print '-' * 70
             stdout.flush()
 
@@ -69,36 +70,42 @@ class Signal(object):
         self.parameters = None
         self.previous_handler = None
 
+
 def log_signal(signum, sip_logger, signal_cb, cb_params):
     sip_logger.write('Dispatching signal %d to handler %s' % (signum, str(signal_cb)))
     return signal_cb(*cb_params)
+
 
 def LogSignal(sip_logger, signum, signal_cb, *cb_params):
     sip_logger.write('Registering signal %d to handler %s' % (signum, str(signal_cb)))
     return Signal(signum, log_signal, signum, sip_logger, signal_cb, cb_params)
 
+
 if __name__ == '__main__':
     from signal import SIGHUP, SIGURG, SIGTERM
     from os import kill, getpid
+
 
     def test(arguments):
         arguments['test'] = not arguments['test']
         reactor.crash()
 
-    arguments = {'test':False}
+
+    arguments = {'test': False}
     s = Signal(SIGURG, test, arguments)
     kill(getpid(), SIGURG)
     reactor.run()
-    assert(arguments['test'])
+    assert (arguments['test'])
     s.cancel()
     Signal(SIGHUP, test, arguments)
     kill(getpid(), SIGURG)
     kill(getpid(), SIGHUP)
     reactor.run()
-    assert(not arguments['test'])
+    assert (not arguments['test'])
     from SipLogger import SipLogger
+
     sip_logger = SipLogger('Signal::selftest')
     LogSignal(sip_logger, SIGTERM, test, arguments)
     kill(getpid(), SIGTERM)
     reactor.run()
-    assert(arguments['test'])
+    assert (arguments['test'])

@@ -26,8 +26,8 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#import sys
-#sys.path.append('..')
+# import sys
+# sys.path.append('..')
 
 from sippy.Timeout import Timeout
 from sippy.Signal import Signal
@@ -64,6 +64,7 @@ from sippy.MyConfigParser import MyConfigParser
 from traceback import print_exc
 from datetime import datetime
 
+
 def re_replace(ptrn, s):
     s = s.split('#', 1)[0]
     ptrn = ptrn.split('/')
@@ -84,18 +85,30 @@ def re_replace(ptrn, s):
         ptrn = ptrn[3:]
     return s
 
+
 class CCStateIdle(object):
     sname = 'Idle'
+
+
 class CCStateWaitRoute(object):
     sname = 'WaitRoute'
+
+
 class CCStateARComplete(object):
     sname = 'ARComplete'
+
+
 class CCStateConnected(object):
     sname = 'Connected'
+
+
 class CCStateDead(object):
     sname = 'Dead'
+
+
 class CCStateDisconnecting(object):
     sname = 'Disconnecting'
+
 
 class CallController(object):
     id = 1
@@ -122,8 +135,8 @@ class CallController(object):
         self.id = CallController.id
         CallController.id += 1
         self.global_config = global_config
-        self.uaA = UA(self.global_config, event_cb = self.recvEvent, conn_cbs = (self.aConn,), disc_cbs = (self.aDisc,), \
-          fail_cbs = (self.aDisc,), dead_cbs = (self.aDead,))
+        self.uaA = UA(self.global_config, event_cb=self.recvEvent, conn_cbs=(self.aConn,), disc_cbs=(self.aDisc,), \
+                      fail_cbs=(self.aDisc,), dead_cbs=(self.aDead,))
         self.uaA.kaInterval = self.global_config['keepalive_ans']
         self.uaA.local_ua = self.global_config['_uaname']
         self.state = CCStateIdle
@@ -138,19 +151,19 @@ class CallController(object):
             if self.state == CCStateIdle:
                 if not isinstance(event, CCEventTry):
                     # Some weird event received
-                    self.uaA.recvEvent(CCEventDisconnect(rtime = event.rtime))
+                    self.uaA.recvEvent(CCEventDisconnect(rtime=event.rtime))
                     return
                 self.cId, cGUID, self.cli, self.cld, body, auth, self.caller_name = event.getData()
                 self.cGUID = cGUID.hexForm()
                 if self.cld == None:
-                    self.uaA.recvEvent(CCEventFail((500, 'Internal Server Error (1)'), rtime = event.rtime))
+                    self.uaA.recvEvent(CCEventFail((500, 'Internal Server Error (1)'), rtime=event.rtime))
                     self.state = CCStateDead
                     return
                 if body != None and self.global_config.has_key('_allowed_pts'):
                     try:
                         body.parse()
                     except:
-                        self.uaA.recvEvent(CCEventFail((400, 'Malformed SDP Body'), rtime = event.rtime))
+                        self.uaA.recvEvent(CCEventFail((400, 'Malformed SDP Body'), rtime=event.rtime))
                         self.state = CCStateDead
                         return
                     allowed_pts = self.global_config['_allowed_pts']
@@ -173,9 +186,9 @@ class CallController(object):
                     self.cld = re_replace(self.global_config['static_tr_in'], self.cld)
                     event.data = (self.cId, cGUID, self.cli, self.cld, body, auth, self.caller_name)
                 if self.global_config.has_key('_rtp_proxy_clients'):
-                    self.rtp_proxy_session = Rtp_proxy_session(self.global_config, call_id = self.cId, \
-                      notify_socket = self.global_config['b2bua_socket'], \
-                      notify_tag = quote('r %s' % str(self.id)))
+                    self.rtp_proxy_session = Rtp_proxy_session(self.global_config, call_id=self.cId,
+                                                               notify_socket=self.global_config['b2bua_socket'],
+                                                               notify_tag=quote('r %s' % str(self.id)))
                     self.rtp_proxy_session.callee.raddress = (self.remote_ip, 5060)
                     self.rtp_proxy_session.insert_nortpp = True
                 self.eTry = event
@@ -185,19 +198,25 @@ class CallController(object):
                     self.rDone(((), 0))
                 elif auth == None or auth.username == None or len(auth.username) == 0:
                     self.username = self.remote_ip
-                    self.auth_proc = self.global_config['_radius_client'].do_auth(self.remote_ip, self.cli, self.cld, self.cGUID, \
-                      self.cId, self.remote_ip, self.rDone)
+                    self.auth_proc = self.global_config['_radius_client'].do_auth(self.remote_ip, self.cli, self.cld,
+                                                                                  self.cGUID, self.cId, self.remote_ip,
+                                                                                  self.rDone)
                 else:
                     self.username = auth.username
-                    self.auth_proc = self.global_config['_radius_client'].do_auth(auth.username, self.cli, self.cld, self.cGUID, 
-                      self.cId, self.remote_ip, self.rDone, auth.realm, auth.nonce, auth.uri, auth.response)
+                    self.auth_proc = self.global_config['_radius_client'].do_auth(auth.username, self.cli, self.cld,
+                                                                                  self.cGUID,
+                                                                                  self.cId, self.remote_ip, self.rDone,
+                                                                                  auth.realm, auth.nonce, auth.uri,
+                                                                                  auth.response)
                 return
             if self.state not in (CCStateARComplete, CCStateConnected, CCStateDisconnecting) or self.uaO == None:
                 return
             self.uaO.recvEvent(event)
         else:
-            if (isinstance(event, CCEventFail) or isinstance(event, CCEventDisconnect)) and self.state == CCStateARComplete and \
-              (isinstance(self.uaA.state, UasStateTrying) or isinstance(self.uaA.state, UasStateRinging)) and len(self.routes) > 0:
+            if (isinstance(event, CCEventFail) or isinstance(event,
+                                                             CCEventDisconnect)) and self.state == CCStateARComplete and \
+                    (isinstance(self.uaA.state, UasStateTrying) or isinstance(self.uaA.state, UasStateRinging)) and len(
+                self.routes) > 0:
                 if isinstance(event, CCEventFail):
                     code = event.getData()[0]
                 else:
@@ -220,9 +239,9 @@ class CallController(object):
                 self.state = CCStateDead
             return
         if self.global_config['acct_enable']:
-            self.acctA = RadiusAccounting(self.global_config, 'answer', \
-              send_start = self.global_config['start_acct_enable'], lperiod = \
-              self.global_config.getdefault('alive_acct_int', None))
+            self.acctA = RadiusAccounting(self.global_config, 'answer',
+                                          send_start=self.global_config['start_acct_enable'],
+                                          lperiod=self.global_config.getdefault('alive_acct_int', None))
             self.acctA.ms_precision = self.global_config.getdefault('precise_acct', False)
             self.acctA.setParams(self.username, self.cli, self.cld, self.cGUID, self.cId, self.remote_ip)
         else:
@@ -254,17 +273,17 @@ class CallController(object):
                 return
             routing = [B2BRoute(x[1][8:]) for x in routing]
         else:
-            routing = [self.global_config['_static_route'].getCopy(),]
+            routing = [self.global_config['_static_route'].getCopy(), ]
         rnum = 0
         for oroute in routing:
             rnum += 1
             max_credit_time = self.global_config.getdefault('max_credit_time', None)
             oroute.customize(rnum, self.cld, self.cli, credit_time, self.pass_headers, \
-              max_credit_time)
+                             max_credit_time)
             if oroute.credit_time == 0 or oroute.expires == 0:
                 continue
             self.routes.append(oroute)
-            #print 'Got route:', oroute.hostport, oroute.cld
+            # print 'Got route:', oroute.hostport, oroute.cld
         if len(self.routes) == 0:
             self.uaA.recvEvent(CCEventFail((500, 'Internal Server Error (3)')))
             self.state = CCStateDead
@@ -285,12 +304,12 @@ class CallController(object):
             host = oroute.hostonly
             nh_address, same_af = oroute.getNHAddr(self.source)
         if not oroute.forward_on_fail and self.global_config['acct_enable']:
-            self.acctO = RadiusAccounting(self.global_config, 'originate', \
-              send_start = self.global_config['start_acct_enable'], lperiod = \
-              self.global_config.getdefault('alive_acct_int', None))
+            self.acctO = RadiusAccounting(self.global_config, 'originate',
+                                          send_start=self.global_config['start_acct_enable'],
+                                          lperiod=self.global_config.getdefault('alive_acct_int', None))
             self.acctO.ms_precision = self.global_config.getdefault('precise_acct', False)
             self.acctO.setParams(oroute.params.get('bill-to', self.username), oroute.params.get('bill-cli', oroute.cli), \
-              oroute.params.get('bill-cld', cld), self.cGUID, self.cId, host)
+                                 oroute.params.get('bill-cld', cld), self.cGUID, self.cId, host)
         else:
             self.acctO = None
         self.acctA.credit_time = oroute.credit_time
@@ -298,9 +317,10 @@ class CallController(object):
         disc_handlers = []
         if not oroute.forward_on_fail and self.global_config['acct_enable']:
             disc_handlers.append(self.acctO.disc)
-        self.uaO = UA(self.global_config, self.recvEvent, oroute.user, oroute.passw, nh_address, oroute.credit_time, tuple(conn_handlers), \
-          tuple(disc_handlers), tuple(disc_handlers), dead_cbs = (self.oDead,), expire_time = oroute.expires, \
-          no_progress_time = oroute.no_progress_expires, extra_headers = oroute.extra_headers)
+        self.uaO = UA(self.global_config, self.recvEvent, oroute.user, oroute.passw, nh_address, oroute.credit_time,
+                      tuple(conn_handlers), tuple(disc_handlers), tuple(disc_handlers), dead_cbs=(self.oDead,),
+                      expire_time=oroute.expires,
+                      no_progress_time=oroute.no_progress_expires, extra_headers=oroute.extra_headers)
         self.uaO.local_ua = self.global_config['_uaname']
         if self.source != oroute.params.get('outbound_proxy', None):
             self.uaO.outbound_proxy = oroute.params.get('outbound_proxy', None)
@@ -319,8 +339,8 @@ class CallController(object):
             cId = SipCallId(md5(str(cId)).hexdigest() + ('-b2b_%d' % oroute.rnum))
         else:
             cId += '-b2b_%d' % oroute.rnum
-        event = CCEventTry((cId, cGUID, oroute.cli, cld, body, auth, \
-          oroute.params.get('caller_name', self.caller_name)))
+        event = CCEventTry((cId, cGUID, oroute.cli, cld, body, auth,
+                            oroute.params.get('caller_name', self.caller_name)))
         if self.eTry.max_forwards != None:
             event.max_forwards = self.eTry.max_forwards - 1
             if event.max_forwards <= 0:
@@ -330,8 +350,8 @@ class CallController(object):
         event.reason = self.eTry.reason
         self.uaO.recvEvent(event)
 
-    def disconnect(self, rtime = None):
-        self.uaA.disconnect(rtime = rtime)
+    def disconnect(self, rtime=None):
+        self.uaA.disconnect(rtime=rtime)
 
     def oConn(self, ua, rtime, origin):
         if self.acctO != None:
@@ -341,7 +361,7 @@ class CallController(object):
         self.state = CCStateConnected
         self.acctA.conn(ua, rtime, origin)
 
-    def aDisc(self, ua, rtime, origin, result = 0):
+    def aDisc(self, ua, rtime, origin, result=0):
         if self.state == CCStateWaitRoute and self.auth_proc != None:
             self.auth_proc.cancel()
             self.auth_proc = None
@@ -371,7 +391,7 @@ class CallController(object):
 
     def group_expires(self, skipto):
         if self.state != CCStateARComplete or len(self.routes) == 0 or self.routes[0][0] > skipto or \
-          (not isinstance(self.uaA.state, UasStateTrying) and not isinstance(self.uaA.state, UasStateRinging)):
+                (not isinstance(self.uaA.state, UasStateTrying) and not isinstance(self.uaA.state, UasStateRinging)):
             return
         # When the last group in the list has timeouted don't disconnect
         # the current attempt forcefully. Instead, make sure that if the
@@ -384,6 +404,7 @@ class CallController(object):
             self.routes.pop(0)
         self.uaO.disconnect()
 
+
 class CallMap(object):
     ccmap = None
     el = None
@@ -391,8 +412,9 @@ class CallMap(object):
     safe_restart = False
     global_config = None
     proxy = None
-    #rc1 = None
-    #rc2 = None
+
+    # rc1 = None
+    # rc2 = None
 
     def __init__(self, global_config):
         self.global_config = global_config
@@ -401,19 +423,19 @@ class CallMap(object):
         Signal(SIGHUP, self.discAll, SIGHUP)
         Signal(SIGUSR2, self.toggleDebug, SIGUSR2)
         Signal(SIGPROF, self.safeRestart, SIGPROF)
-        #gc.disable()
-        #gc.set_debug(gc.DEBUG_STATS)
-        #gc.set_threshold(0)
-        #print gc.collect()
+        # gc.disable()
+        # gc.set_debug(gc.DEBUG_STATS)
+        # gc.set_threshold(0)
+        # print gc.collect()
 
     def recvRequest(self, req, sip_t):
         try:
             to_tag = req.getHFBody('to').getTag()
         except Exception as exception:
             print(datetime.now(), 'can\'t parse SIP request: %s:\n' % str(exception))
-            print( '-' * 70)
-            print_exc(file = sys.stdout)
-            print( '-' * 70)
+            print('-' * 70)
+            print_exc(file=sys.stdout)
+            print('-' * 70)
             print(req)
             print('-' * 70)
             sys.stdout.flush()
@@ -433,7 +455,7 @@ class CallMap(object):
             # First check if request comes from IP that
             # we want to accept our traffic from
             if self.global_config.has_key('_accept_ips') and \
-              not source[0] in self.global_config['_accept_ips']:
+                    not source[0] in self.global_config['_accept_ips']:
                 resp = req.genResponse(403, 'Forbidden')
                 return (resp, None, None)
 
@@ -443,8 +465,8 @@ class CallMap(object):
                 # Depending on configuration, we might try remote ip auth
                 # first and then challenge it or challenge immediately.
                 if self.global_config['digest_auth'] and \
-                  req.countHFs('authorization') == 0:
-                    challenge = SipHeader(name = 'www-authenticate')
+                                req.countHFs('authorization') == 0:
+                    challenge = SipHeader(name='www-authenticate')
                     challenge.getBody().realm = req.getRURI().host
                 # Send challenge immediately if digest is the
                 # only method of authenticating
@@ -470,7 +492,7 @@ class CallMap(object):
             return (req.genResponse(200, 'OK'), None, None)
         return (req.genResponse(501, 'Not Implemented'), None, None)
 
-    def discAll(self, signum = None):
+    def discAll(self, signum=None):
         if signum != None:
             print('Signal %d received, disconnecting all calls' % signum)
         for cc in tuple(self.ccmap):
@@ -497,18 +519,18 @@ class CallMap(object):
                 except AttributeError:
                     print(None)
         else:
-            print('[%d]: %d client, %d server transactions in memory' % \
-              (os.getpid(), len(self.global_config['_sip_tm'].tclient), len(self.global_config['_sip_tm'].tserver)))
+            print('[%d]: %d client, %d server transactions in memory' % (
+                os.getpid(), len(self.global_config['_sip_tm'].tclient), len(self.global_config['_sip_tm'].tserver)))
         if self.safe_restart:
             if len(self.ccmap) == 0:
                 self.global_config['_sip_tm'].userv.close()
                 os.chdir(self.global_config['_orig_cwd'])
-                argv = [sys.executable,]
+                argv = [sys.executable, ]
                 argv.extend(self.global_config['_orig_argv'])
                 os.execv(sys.executable, argv)
                 # Should not reach this point!
             self.el.ival = 1
-        #print gc.collect()
+        # print gc.collect()
         if len(gc.garbage) > 0:
             print(gc.garbage)
 
@@ -524,13 +546,12 @@ class CallMap(object):
             for cc in self.ccmap:
                 res += '%s: %s (' % (cc.cId, cc.state.sname)
                 if cc.uaA != None:
-                    res += '%s %s:%d %s %s -> ' % (cc.uaA.state, cc.uaA.getRAddr0()[0], \
-                      cc.uaA.getRAddr0()[1], cc.uaA.getCLD(), cc.uaA.getCLI())
+                    res += '%s %s:%d %s %s -> ' % (cc.uaA.state, cc.uaA.getRAddr0()[0], cc.uaA.getRAddr0()[1], cc.uaA.getCLD(), cc.uaA.getCLI())
                 else:
                     res += 'N/A -> '
                 if cc.uaO != None:
-                    res += '%s %s:%d %s %s)\n' % (cc.uaO.state, cc.uaO.getRAddr0()[0], \
-                      cc.uaO.getRAddr0()[1], cc.uaO.getCLI(), cc.uaO.getCLD())
+                    res += '%s %s:%d %s %s)\n' % (
+                    cc.uaO.state, cc.uaO.getRAddr0()[0], cc.uaO.getRAddr0()[1], cc.uaO.getCLI(), cc.uaO.getCLD())
                 else:
                     res += 'N/A)\n'
                 total += 1
@@ -605,6 +626,7 @@ class CallMap(object):
         clim.send('ERROR: unknown command\n')
         return False
 
+
 def reopen(signum, logfile):
     print('Signal %d received, reopening logs' % signum)
     fd = os.open(logfile, os.O_WRONLY | os.O_CREAT | os.O_APPEND)
@@ -612,7 +634,8 @@ def reopen(signum, logfile):
     os.dup2(fd, sys.__stderr__.fileno())
     os.close(fd)
 
-def usage(global_config, brief = False):
+
+def usage(global_config, brief=False):
     print('usage: b2bua.py [--option1=value1] [--option2=value2] ... [--optionN==valueN]')
     if not brief:
         print('\navailable options:\n')
@@ -633,7 +656,7 @@ def main_func():
     global_config['_orig_cwd'] = os.getcwd()
     try:
         opts, args = getopt.getopt(sys.argv[1:], 'fDl:p:d:P:L:s:a:t:T:k:m:A:ur:F:R:h:c:M:HC:W:',
-          global_config.get_longopts())
+                                   global_config.get_longopts())
     except getopt.GetoptError:
         usage(global_config)
     global_config['foreground'] = False
@@ -756,14 +779,14 @@ def main_func():
         global_config.write(open(writeconf, 'w'))
 
     if not global_config['foreground']:
-        daemonize(logfile = global_config['logfile'])
+        daemonize(logfile=global_config['logfile'])
 
     global_config['_sip_logger'] = SipLogger('b2bua')
 
     if len(rtp_proxy_clients) > 0:
         global_config['_rtp_proxy_clients'] = []
         for address in rtp_proxy_clients:
-            global_config['_rtp_proxy_clients'].append(Rtp_proxy_client(global_config, spath = address))
+            global_config['_rtp_proxy_clients'].append(Rtp_proxy_client(global_config, spath=address))
 
     if global_config['auth_enable'] or global_config['acct_enable']:
         global_config['_radius_client'] = RadiusAuthorisation(global_config)
@@ -793,7 +816,7 @@ def main_func():
         Signal(SIGUSR1, reopen, SIGUSR1, global_config['logfile'])
 
     reactor.suggestThreadPoolSize(50)
-    reactor.run(installSignalHandlers = True)
+    reactor.run(installSignalHandlers=True)
 
 
 if __name__ == '__main__':

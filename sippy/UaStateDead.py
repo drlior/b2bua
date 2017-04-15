@@ -26,6 +26,7 @@
 
 from UaStateGeneric import UaStateGeneric
 
+
 class UaStateDead(UaStateGeneric):
     sname = 'Dead'
     dead = True

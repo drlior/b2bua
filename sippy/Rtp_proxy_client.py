@@ -30,9 +30,10 @@ from Rtp_proxy_client_stream import Rtp_proxy_client_stream
 
 import socket
 
-CAPSTABLE = {'20071218':'copy_supported', '20080403':'stat_supported', \
-  '20081224':'tnot_supported', '20090810':'sbind_supported', \
-  '20150617':'wdnt_supported'}
+CAPSTABLE = {'20071218': 'copy_supported', '20080403': 'stat_supported', \
+             '20081224': 'tnot_supported', '20090810': 'sbind_supported', \
+             '20150617': 'wdnt_supported'}
+
 
 class Rtpp_caps_checker(object):
     caps_requested = 0
@@ -58,6 +59,7 @@ class Rtpp_caps_checker(object):
             self.rtpc.go_online()
             self.rtpc = None
 
+
 class Rtp_proxy_client(Rtp_proxy_client_udp, Rtp_proxy_client_stream):
     worker = None
     address = None
@@ -80,7 +82,7 @@ class Rtp_proxy_client(Rtp_proxy_client_udp, Rtp_proxy_client_stream):
     rtpp_class = None
 
     def __init__(self, global_config, *address, **kwargs):
-        #print 'Rtp_proxy_client', address
+        # print 'Rtp_proxy_client', address
         no_version_check = False
         if kwargs.has_key('no_version_check'):
             no_version_check = kwargs['no_version_check']
@@ -153,12 +155,12 @@ class Rtp_proxy_client(Rtp_proxy_client_udp, Rtp_proxy_client_stream):
             self.rtpp_class = Rtp_proxy_client_udp
             self.proxy_address = address[0][0]
             Rtp_proxy_client_udp.__init__(self, global_config, *address, \
-              **kwargs)
+                                          **kwargs)
         else:
             self.rtpp_class = Rtp_proxy_client_stream
             self.proxy_address = global_config['_sip_address']
             Rtp_proxy_client_stream.__init__(self, global_config, *address, \
-              **kwargs)
+                                             **kwargs)
         if not no_version_check:
             self.version_check()
         else:
@@ -189,13 +191,13 @@ class Rtp_proxy_client(Rtp_proxy_client_udp, Rtp_proxy_client_stream):
             to.go()
 
     def heartbeat(self):
-        #print 'heartbeat', self, self.address
+        # print 'heartbeat', self, self.address
         if self.shut_down:
             return
         self.send_command('Ib', self.heartbeat_reply)
 
     def heartbeat_reply(self, stats):
-        #print 'heartbeat_reply', self.address, stats, self.online
+        # print 'heartbeat_reply', self.address, stats, self.online
         if self.shut_down:
             return
         if not self.online:
@@ -235,7 +237,7 @@ class Rtp_proxy_client(Rtp_proxy_client_udp, Rtp_proxy_client_stream):
     def go_offline(self):
         if self.shut_down:
             return
-        #print 'go_offline', self.address, self.online
+        # print 'go_offline', self.address, self.online
         if self.online:
             self.online = False
             to = TimeoutInact(self.version_check, self.hrtb_retr_ival)
@@ -250,7 +252,7 @@ class Rtp_proxy_client(Rtp_proxy_client_udp, Rtp_proxy_client_stream):
         self.ptransmitted = ptransmitted
 
     def shutdown(self):
-        if self.shut_down: # do not crash when shutdown() called twice
+        if self.shut_down:  # do not crash when shutdown() called twice
             return
         self.shut_down = True
         self.rtpp_class.shutdown(self)

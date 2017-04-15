@@ -31,6 +31,7 @@ from twisted.internet import reactor
 
 DEFAULT_RTPP_SPATH = 'unix:/var/run/rtpproxy.sock'
 
+
 class command_runner(object):
     responses = None
     commands = None
@@ -38,7 +39,7 @@ class command_runner(object):
     fin = None
     fout = None
 
-    def __init__(self, rc, commands = None, fin = None, fout = None):
+    def __init__(self, rc, commands=None, fin=None, fout=None):
         self.responses = []
         if commands == None and fin == None:
             raise ValueError('either "commands" or "fin" argument should be non-None')
@@ -68,9 +69,12 @@ class command_runner(object):
         self.responses.append(result)
         self.issue_next_cmd()
 
+
 def usage():
-    print('usage: rtpp_query.py [-s rtpp_socket_path] [-S sippy_root_path] [-i infile] [-o outfile] [cmd1 [cmd2]..[cmdN]]')
+    print(
+    'usage: rtpp_query.py [-s rtpp_socket_path] [-S sippy_root_path] [-i infile] [-o outfile] [cmd1 [cmd2]..[cmdN]]')
     sys.exit(1)
+
 
 if __name__ == '__main__':
     global_config = {}
@@ -101,13 +105,13 @@ if __name__ == '__main__':
             else:
                 file_in = file(fname, 'r')
         if o == '-o':
-           fname = a.strip()
-           if fname == '-':
-               file_out = sys.stdout
-           else:
-               file_out = file(fname, 'w')
+            fname = a.strip()
+            if fname == '-':
+                file_out = sys.stdout
+            else:
+                file_out = file(fname, 'w')
         if o == '-b':
-           no_rtpp_version_check = True
+            no_rtpp_version_check = True
 
     if len(args) > 0:
         commands = args
@@ -117,9 +121,9 @@ if __name__ == '__main__':
 
     from sippy.Rtp_proxy_client import Rtp_proxy_client
 
-    rc = Rtp_proxy_client(global_config, spath = spath, nworkers = 4, \
-      no_version_check = no_rtpp_version_check)
-    #commands = ('VF 123456', 'G nsess_created', 'G ncmds_rcvd')
+    rc = Rtp_proxy_client(global_config, spath=spath, nworkers=4, \
+                          no_version_check=no_rtpp_version_check)
+    # commands = ('VF 123456', 'G nsess_created', 'G ncmds_rcvd')
     crun = command_runner(rc, commands, file_in, file_out)
-    reactor.run(installSignalHandlers = 1)
+    reactor.run(installSignalHandlers=1)
     rc.shutdown()

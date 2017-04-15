@@ -30,11 +30,12 @@ from time import time
 from SipConf import SipConf
 from SipGenericHF import SipGenericHF
 
+
 class SipCallId(SipGenericHF):
     hf_names = ('call-id', 'i')
     body = None
 
-    def __init__(self, body = None):
+    def __init__(self, body=None):
         SipGenericHF.__init__(self, body)
         self.parsed = True
         if body == None:
@@ -46,7 +47,7 @@ class SipCallId(SipGenericHF):
     def genCallId(self):
         self.body = md5(str((random() * 1000000000L) + time())).hexdigest() + '@' + str(SipConf.my_address)
 
-    def getCanName(self, name, compact = False):
+    def getCanName(self, name, compact=False):
         if compact:
             return 'i'
         return 'Call-ID'

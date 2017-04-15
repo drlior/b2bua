@@ -27,6 +27,7 @@
 from Timeout import Timeout
 from UaStateGeneric import UaStateGeneric
 
+
 class UaStateFailed(UaStateGeneric):
     sname = 'Failed'
 
@@ -37,8 +38,9 @@ class UaStateFailed(UaStateGeneric):
         Timeout(self.goDead, ua.godead_timeout)
 
     def goDead(self):
-        #print 'Time in Failed state expired, going to the Dead state'
+        # print 'Time in Failed state expired, going to the Dead state'
         self.ua.changeState((UaStateDead,))
+
 
 if not globals().has_key('UaStateDead'):
     from UaStateDead import UaStateDead

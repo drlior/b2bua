@@ -35,6 +35,7 @@ from errno import EINTR
 
 _MAX_WORKERS = 20
 
+
 class _Worker(Thread):
     command = None
     master = None
@@ -50,8 +51,8 @@ class _Worker(Thread):
         need_close_fds = True
         if platform == 'win32':
             need_close_fds = False
-        pipe = Popen(self.command, shell = False, stdin = PIPE, \
-          stdout = PIPE, stderr = PIPE, close_fds = need_close_fds)
+        pipe = Popen(self.command, shell=False, stdin=PIPE, \
+                     stdout=PIPE, stderr=PIPE, close_fds=need_close_fds)
         while True:
             self.master.work_available.acquire()
             while len(self.master.work) == 0:
@@ -85,10 +86,12 @@ class _Worker(Thread):
                 if len(line) == 0:
                     break
                 result.append(line)
-            reactor.callFromThread(self.master.process_result, wi.result_callback, tuple(result), *wi.callback_parameters)
+            reactor.callFromThread(self.master.process_result, wi.result_callback, tuple(result),
+                                   *wi.callback_parameters)
             wi.data = None
             wi.result_callback = None
             wi.callback_parameters = None
+
 
 class Work_item(object):
     cancelled = False
@@ -115,11 +118,12 @@ class Work_item(object):
         self.cancelled_lock.release()
         return status
 
+
 class External_command(object):
     work_available = None
     work = None
 
-    def __init__(self, command, max_workers = _MAX_WORKERS):
+    def __init__(self, command, max_workers=_MAX_WORKERS):
         self.work_available = Condition()
         self.work = []
         for i in range(0, max_workers):
@@ -145,13 +149,15 @@ class External_command(object):
         except:
             print datetime.now(), 'External_command: unhandled exception in external command results callback'
             print '-' * 70
-            print_exc(file = stdout)
+            print_exc(file=stdout)
             print '-' * 70
             stdout.flush()
+
 
 if __name__ == '__main__':
     from sys import exit
     from time import sleep
+
 
     def results_received(results):
         global external_command
@@ -161,6 +167,7 @@ if __name__ == '__main__':
         if not results == ('foo', 'bar'):
             exit(1)
         reactor.crash()
+
 
     external_command = External_command('/bin/cat')
     external_command.process_command(('foo', 'bar'), results_received)

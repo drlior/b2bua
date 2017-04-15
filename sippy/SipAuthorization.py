@@ -28,6 +28,7 @@ from SipGenericHF import SipGenericHF
 from hashlib import md5
 from time import time
 
+
 class SipAuthorization(SipGenericHF):
     hf_names = ('authorization',)
     username = None
@@ -40,8 +41,8 @@ class SipAuthorization(SipGenericHF):
     nc = None
     otherparams = None
 
-    def __init__(self, body = None, username = None, uri = None, realm = None, nonce = None, response = None, \
-                 password = None, method = None, cself = None):
+    def __init__(self, body=None, username=None, uri=None, realm=None, nonce=None, response=None, \
+                 password=None, method=None, cself=None):
         SipGenericHF.__init__(self, body)
         if body != None:
             return
@@ -98,7 +99,7 @@ class SipAuthorization(SipGenericHF):
                (self.username, self.realm, self.nonce, self.uri, self.response)
         if self.qop != None:
             rval += ',nc="%s",cnonce="%s",qop=%s' % (self.nc, self.cnonce, \
-              self.qop)
+                                                     self.qop)
         for param in self.otherparams:
             rval += ',%s=%s' % param
         return rval
@@ -106,7 +107,7 @@ class SipAuthorization(SipGenericHF):
     def getCopy(self):
         if not self.parsed:
             return self.__class__(self.body)
-        return self.__class__(cself = self)
+        return self.__class__(cself=self)
 
     def verify(self, password, method):
         if not self.parsed:
@@ -117,13 +118,13 @@ class SipAuthorization(SipGenericHF):
         if not self.parsed:
             self.parse()
         response = DigestCalcResponse(HA1, self.nonce, self.nc, \
-          self.cnonce, self.qop, method, self.uri, '')
+                                      self.cnonce, self.qop, method, self.uri, '')
         return response == self.response
 
-    def getCanName(self, name, compact = False):
+    def getCanName(self, name, compact=False):
         return 'Authorization'
 
-    def hasValidNonce(self, timeout = 300):
+    def hasValidNonce(self, timeout=300):
         if self.nonce == None:
             return False
         try:
@@ -132,6 +133,7 @@ class SipAuthorization(SipGenericHF):
         except:
             pass
         return False
+
 
 def DigestCalcHA1(pszAlg, pszUserName, pszRealm, pszPassword, pszNonce, pszCNonce):
     m = md5()
@@ -150,6 +152,7 @@ def DigestCalcHA1(pszAlg, pszUserName, pszRealm, pszPassword, pszNonce, pszCNonc
         m.update(pszCNonce)
         HA1 = m.digest()
     return HA1.encode('hex')
+
 
 def DigestCalcResponse(HA1, pszNonce, pszNonceCount, pszCNonce, pszQop, pszMethod, pszDigestUri, pszHEntity):
     m = md5()

@@ -25,11 +25,12 @@
 
 from socket import getaddrinfo, SOCK_DGRAM, AF_INET, AF_INET6
 
+
 class Rtp_proxy_client_net(object):
-    sock_type = None # Set me in superclass!
+    sock_type = None  # Set me in superclass!
 
     def getdestbyaddr(self, address, af):
-        #print('getaddrinfo', address[0], address[1], af, self.sock_type)
+        # print('getaddrinfo', address[0], address[1], af, self.sock_type)
         if af == AF_INET6 and address[0].startswith('['):
             return address
         ainfo = getaddrinfo(address[0], address[1], af, self.sock_type)

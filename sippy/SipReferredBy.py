@@ -26,5 +26,6 @@
 
 from SipAddressHF import SipAddressHF
 
+
 class SipReferredBy(SipAddressHF):
     hf_names = ('referred-by',)

@@ -30,12 +30,13 @@ from time import time
 from SipGenericHF import SipGenericHF
 from SipConf import SipConf
 
+
 class SipWWWAuthenticate(SipGenericHF):
     hf_names = ('www-authenticate',)
     realm = None
     nonce = None
 
-    def __init__(self, body = None, realm = None, nonce = None):
+    def __init__(self, body=None, realm=None, nonce=None):
         SipGenericHF.__init__(self, body)
         if body != None:
             return
@@ -66,7 +67,7 @@ class SipWWWAuthenticate(SipGenericHF):
     def __str__(self):
         return self.localStr()
 
-    def localStr(self, local_addr = None, local_port = None):
+    def localStr(self, local_addr=None, local_port=None):
         if not self.parsed:
             return self.body
         if local_addr != None and 'my' in dir(self.realm):
@@ -76,9 +77,9 @@ class SipWWWAuthenticate(SipGenericHF):
     def getCopy(self):
         if not self.parsed:
             return self.__class__(self.body)
-        return self.__class__(realm = self.realm, nonce = self.nonce)
+        return self.__class__(realm=self.realm, nonce=self.nonce)
 
-    def getCanName(self, name, compact = False):
+    def getCanName(self, name, compact=False):
         return 'WWW-Authenticate'
 
     def getRealm(self):

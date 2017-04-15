@@ -27,7 +27,7 @@ import ctypes, os, platform
 import ctypes.util
 
 CLOCK_REALTIME = 0
-CLOCK_MONOTONIC = 4 # see <linux/time.h> / <include/time.h>
+CLOCK_MONOTONIC = 4  # see <linux/time.h> / <include/time.h>
 if platform.system() == 'FreeBSD':
     # FreeBSD-specific
     CLOCK_UPTIME = 5
@@ -39,11 +39,13 @@ elif platform.system() == 'Linux':
     # Linux-specific
     CLOCK_BOOTTIME = 7
 
+
 class timespec(ctypes.Structure):
     _fields_ = [
         ('tv_sec', ctypes.c_long),
         ('tv_nsec', ctypes.c_long)
     ]
+
 
 def find_lib(libname, paths):
     spaths = ['%s/lib%s.so' % (path, libname) for path in paths]
@@ -60,20 +62,23 @@ def find_lib(libname, paths):
                 return (libcname)
     return ctypes.util.find_library(libname)
 
+
 def find_symbol(symname, lnames, paths):
     for lname in lnames:
         lib = find_lib(lname, paths)
         if lib == None:
             continue
         try:
-            llib = ctypes.CDLL(lib, use_errno = True)
+            llib = ctypes.CDLL(lib, use_errno=True)
             return llib.__getitem__(symname)
         except:
             continue
     raise Exception('Bah, %s cannot be found in libs %s in the paths %s' % (symname, lnames, paths))
 
+
 clock_gettime = find_symbol('clock_gettime', ('c', 'rt'), ('/usr/lib', '/lib'))
 clock_gettime.argtypes = [ctypes.c_int, ctypes.POINTER(timespec)]
+
 
 def clock_getdtime(type):
     t = timespec()
@@ -81,6 +86,7 @@ def clock_getdtime(type):
         errno_ = ctypes.get_errno()
         raise OSError(errno_, os.strerror(errno_))
     return float(t.tv_sec) + float(t.tv_nsec * 1e-09)
+
 
 if __name__ == "__main__":
     print('%.10f' % (clock_getdtime(CLOCK_REALTIME),))

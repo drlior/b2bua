@@ -37,6 +37,7 @@ SIPLOG_WARN = 2
 SIPLOG_ERR = 3
 SIPLOG_CRIT = 4
 
+
 class AsyncLogger(Thread):
     log = None
     app = None
@@ -102,6 +103,7 @@ class AsyncLogger(Thread):
     def closelog(self):
         del self.log
 
+
 class AsyncLoggerSyslog(AsyncLogger):
     def safe_open(self):
         try:
@@ -119,6 +121,7 @@ class AsyncLoggerSyslog(AsyncLogger):
     def closelog(self):
         syslog.closelog()
 
+
 class SipLogger(object):
     app = None
     call_id = None
@@ -132,7 +135,7 @@ class SipLogger(object):
     itime = None
     offstime = False
 
-    def __init__(self, app, call_id = 'GLOBAL', logfile = '/var/log/sip.log'):
+    def __init__(self, app, call_id='GLOBAL', logfile='/var/log/sip.log'):
         self.itime = time()
         self.app = '/%s' % app
         self.call_id = call_id
@@ -206,11 +209,10 @@ class SipLogger(object):
             pid = '[%d]' % self.pid
         else:
             pid = ''
-        return '%s/%s%s%s: %s\n' % (self.ftime(ltime), \
-          call_id, self.app, pid, \
-          reduce(lambda x, y: x + y, [str(x) for x in args]))
+        return '%s/%s%s%s: %s\n' % (self.ftime(ltime), call_id, self.app, pid,
+                                    reduce(lambda x, y: x + y, [str(x) for x in args]))
 
-    def reopen(self, signum = None):
+    def reopen(self, signum=None):
         self.wi_available.acquire()
         self.wi.append(('reopen', None, None))
         self.wi_available.notify()
@@ -224,6 +226,7 @@ class SipLogger(object):
             self.signal_handler = None
         self.logger.shutdown()
         self.logger = None
+
 
 if __name__ == '__main__':
     log = SipLogger(sys.argv[1])

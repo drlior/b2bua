@@ -29,6 +29,7 @@ from twisted.internet import task, reactor
 from traceback import print_exc, format_list, extract_stack
 from sys import stdout
 
+
 class TimeoutAbsMono:
     _task = None
     _timeout_callback = None
@@ -46,7 +47,7 @@ class TimeoutAbsMono:
         except:
             print datetime.now(), 'TimeoutAbsMono: unhandled exception in timeout callback'
             print '-' * 70
-            print_exc(file = stdout)
+            print_exc(file=stdout)
             print '-' * 70
             stdout.flush()
         self._task = None
@@ -57,15 +58,18 @@ class TimeoutAbsMono:
         self._task = None
         self._timeout_callback = None
 
+
 if __name__ == '__main__':
     from twisted.internet import reactor
     from sippy.Time.MonoTime import MonoTime
-    
+
+
     def test1(arguments, testnum, mtm):
         arguments['delay'] = mtm.offsetFromNow()
         print testnum, arguments['delay']
         arguments['test'] = True
         reactor.crash()
+
 
     def test2(arguments, testnum, mtm):
         arguments['delay'] = mtm.offsetFromNow()
@@ -73,18 +77,19 @@ if __name__ == '__main__':
         arguments['test'] = 'bar'
         reactor.crash()
 
+
     mt = MonoTime()
-    arguments = {'test':False, 'delay':None}
+    arguments = {'test': False, 'delay': None}
     timeout_1 = TimeoutAbsMono(test1, mt, arguments, 'test1', mt)
     reactor.run()
-    assert(arguments['test'])
-    assert(arguments['delay'] < 0.1)
+    assert (arguments['test'])
+    assert (arguments['delay'] < 0.1)
     mt1 = mt.getOffsetCopy(0.1)
     mt2 = mt.getOffsetCopy(0.2)
-    arguments = {'test':False, 'delay':None}
+    arguments = {'test': False, 'delay': None}
     timeout_1 = TimeoutAbsMono(test1, mt1, arguments, 'test2', mt1)
     timeout_2 = TimeoutAbsMono(test2, mt2, arguments, 'test3', mt2)
     timeout_1.cancel()
     reactor.run()
-    assert(arguments['test'] == 'bar')
-    assert(arguments['delay'] < 0.1)
+    assert (arguments['test'] == 'bar')
+    assert (arguments['delay'] < 0.1)

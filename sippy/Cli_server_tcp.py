@@ -28,6 +28,7 @@ from twisted.internet.protocol import Factory
 from twisted.internet import reactor
 from Cli_session import Cli_session
 
+
 class Cli_server_tcp(Factory):
     command_cb = None
     lport = None
@@ -36,7 +37,7 @@ class Cli_server_tcp(Factory):
     def __init__(self, command_cb, address):
         self.command_cb = command_cb
         self.protocol = Cli_session
-        self.lport = reactor.listenTCP(address[1], self, interface = address[0])
+        self.lport = reactor.listenTCP(address[1], self, interface=address[0])
 
     def buildProtocol(self, addr):
         if self.accept_list != None and addr.host not in self.accept_list:
@@ -49,10 +50,13 @@ class Cli_server_tcp(Factory):
     def shutdown(self):
         self.lport.stopListening()
 
+
 if __name__ == '__main__':
     def callback(clm, cmd):
         print cmd
         return False
+
+
     laddr = ('127.0.0.1', 12345)
     f = Cli_server_tcp(callback, laddr)
     reactor.run()

@@ -28,7 +28,7 @@ from __future__ import print_function
 
 from twisted.internet import reactor
 from errno import ECONNRESET, ENOTCONN, ESHUTDOWN, EWOULDBLOCK, ENOBUFS, EAGAIN, \
-  EINTR
+    EINTR
 from datetime import datetime
 from time import sleep, time
 from threading import Thread, Condition
@@ -38,6 +38,7 @@ import sys, traceback
 
 from Timeout import Timeout
 from Time.MonoTime import MonoTime
+
 
 class AsyncSender(Thread):
     userv = None
@@ -80,6 +81,7 @@ class AsyncSender(Thread):
                 sleep(0.01)
         self.userv = None
 
+
 class AsyncReceiver(Thread):
     userv = None
 
@@ -114,7 +116,7 @@ class AsyncReceiver(Thread):
                 else:
                     print(datetime.now(), 'Udp_server: unhandled exception when receiving incoming data')
                     print('-' * 70)
-                    traceback.print_exc(file = sys.stdout)
+                    traceback.print_exc(file=sys.stdout)
                     print('-' * 70)
                     sys.stdout.flush()
                     sleep(1)
@@ -124,10 +126,12 @@ class AsyncReceiver(Thread):
             reactor.callFromThread(self.userv.handle_read, data, address, rtime)
         self.userv = None
 
+
 _DEFAULT_FLAGS = socket.SO_REUSEADDR
 if hasattr(socket, 'SO_REUSEPORT'):
     _DEFAULT_FLAGS |= socket.SO_REUSEPORT
 _DEFAULT_NWORKERS = 30
+
 
 class Udp_server_opts(object):
     laddress = None
@@ -140,7 +144,7 @@ class Udp_server_opts(object):
     ploss_in_rate = 0.0
     pdelay_in_max = 0.0
 
-    def __init__(self, laddress, data_callback, family = None, o = None):
+    def __init__(self, laddress, data_callback, family=None, o=None):
         if o == None:
             if family == None:
                 if laddress != None and laddress[0].startswith('['):
@@ -153,13 +157,13 @@ class Udp_server_opts(object):
             self.data_callback = data_callback
         else:
             self.laddress, self.data_callback, self.family, self.nworkers, self.flags, \
-              self.ploss_out_rate, self.pdelay_out_max, self.ploss_in_rate, \
-              self.pdelay_in_max = o.laddress, o.data_callback, o.family, \
-              o.nworkers, o.flags, o.ploss_out_rate, o.pdelay_out_max, o.ploss_in_rate, \
-              o.pdelay_in_max
+            self.ploss_out_rate, self.pdelay_out_max, self.ploss_in_rate, \
+            self.pdelay_in_max = o.laddress, o.data_callback, o.family, \
+                                 o.nworkers, o.flags, o.ploss_out_rate, o.pdelay_out_max, o.ploss_in_rate, \
+                                 o.pdelay_in_max
 
     def getCopy(self):
-        return self.__class__(None, None, o = self)
+        return self.__class__(None, None, o=self)
 
     def getSIPaddr(self):
         if self.family == socket.AF_INET:
@@ -168,9 +172,10 @@ class Udp_server_opts(object):
 
     def isWildCard(self):
         if (self.family, self.laddress[0]) in ((socket.AF_INET, '0.0.0.0'), \
-          (socket.AF_INET6, '::')):
+                                               (socket.AF_INET6, '::')):
             return True
         return False
+
 
 class Udp_server(object):
     skt = None
@@ -194,7 +199,7 @@ class Udp_server(object):
             if (self.uopts.flags & socket.SO_REUSEADDR) != 0:
                 self.skt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             if hasattr(socket, 'SO_REUSEPORT') and \
-              (self.uopts.flags & socket.SO_REUSEPORT) != 0:
+                            (self.uopts.flags & socket.SO_REUSEPORT) != 0:
                 self.skt.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
             self.skt.bind(address)
         self.sendqueue = []
@@ -207,7 +212,7 @@ class Udp_server(object):
             self.asenders.append(AsyncSender(self))
             self.areceivers.append(AsyncReceiver(self))
 
-    def send_to(self, data, address, delayed = False):
+    def send_to(self, data, address, delayed=False):
         if not isinstance(address, tuple):
             raise Exception('Invalid address, not a tuple: %s' % str(address))
         if not isinstance(data, bytes):
@@ -228,8 +233,8 @@ class Udp_server(object):
         self.wi.append((data, address))
         self.wi_available.notify()
         self.wi_available.release()
- 
-    def handle_read(self, data, address, rtime, delayed = False):
+
+    def handle_read(self, data, address, rtime, delayed=False):
         if len(data) > 0 and self.uopts.data_callback != None:
             self.stats[2] += 1
             if self.uopts.ploss_in_rate > 0.0 and not delayed:
@@ -244,7 +249,7 @@ class Udp_server(object):
             except:
                 print(datetime.now(), 'Udp_server: unhandled exception when processing incoming data')
                 print('-' * 70)
-                traceback.print_exc(file = sys.stdout)
+                traceback.print_exc(file=sys.stdout)
                 print('-' * 70)
                 sys.stdout.flush()
 
@@ -262,6 +267,7 @@ class Udp_server(object):
             worker.join()
         self.asenders = None
         self.areceivers = None
+
 
 class self_test(object):
     from sys import exit
@@ -333,6 +339,7 @@ class self_test(object):
         udp_server_pong.shutdown()
         udp_server_ping6.shutdown()
         udp_server_pong6.shutdown()
+
 
 if __name__ == '__main__':
     self_test().run()

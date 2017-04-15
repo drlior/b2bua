@@ -24,9 +24,10 @@ if __name__ == '__main__':
     if sippy_path != None:
         sys.path.insert(0, sippy_path)
 
-    exec('from sippy.Time.clock_dtime import clock_getdtime, %s' % clock_name)
+    exec ('from sippy.Time.clock_dtime import clock_getdtime, %s' % clock_name)
     if not out_realtime:
         print(clock_getdtime(eval(clock_name)))
     else:
         from sippy.Time.clock_dtime import CLOCK_REALTIME
+
         print("%f %f" % (clock_getdtime(eval(clock_name)), clock_getdtime(CLOCK_REALTIME)))

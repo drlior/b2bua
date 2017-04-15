@@ -28,21 +28,27 @@ from Rtp_proxy_client_stream import Rtp_proxy_client_stream
 
 import socket
 
+
 class Rtp_proxy_client_local(Rtp_proxy_client_stream):
     is_local = True
 
-    def __init__(self, global_config, address = '/var/run/rtpproxy.sock', \
-      bind_address = None, nworkers = 1):
-        Rtp_proxy_client_stream.__init__(self, global_config = global_config, \
-          address = address, bind_address = bind_address, nworkers = nworkers, \
-          family == socket.AF_UNIX)
+    def __init__(self, global_config, address='/var/run/rtpproxy.sock', \
+                 bind_address=None, nworkers=1):
+        Rtp_proxy_client_stream.__init__(self, global_config=global_config, \
+                                         address=address, bind_address=bind_address, nworkers=nworkers, \
+                                         family == socket.AF_UNIX)
+
 
 if __name__ == '__main__':
     from twisted.internet import reactor
+
+
     def display(*args):
         print args
         reactor.crash()
-    r = Rtp_proxy_client_local({'_sip_address':'1.2.3.4'})
+
+
+    r = Rtp_proxy_client_local({'_sip_address': '1.2.3.4'})
     r.send_command('VF 123456', display, 'abcd')
-    reactor.run(installSignalHandlers = 1)
+    reactor.run(installSignalHandlers=1)
     r.shutdown()

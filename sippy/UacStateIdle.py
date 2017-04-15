@@ -34,6 +34,7 @@ from SipTo import SipTo
 from SipFrom import SipFrom
 from SipCallId import SipCallId
 
+
 class UacStateIdle(UaStateGeneric):
     sname = 'Idle(UAC)'
 
@@ -53,15 +54,15 @@ class UacStateIdle(UaStateGeneric):
                 self.ua.cId = SipCallId()
             else:
                 self.ua.cId = cId.getCopy()
-            self.ua.global_config['_sip_tm'].regConsumer(self.ua, str(self.ua.cId), compact = self.ua.compact_sip)
-            self.ua.rTarget = SipURL(username = calledID, host = self.ua.rAddr0[0], port = self.ua.rAddr0[1])
-            self.ua.rUri = SipTo(address = SipAddress(url = self.ua.rTarget.getCopy(), hadbrace = True))
+            self.ua.global_config['_sip_tm'].regConsumer(self.ua, str(self.ua.cId), compact=self.ua.compact_sip)
+            self.ua.rTarget = SipURL(username=calledID, host=self.ua.rAddr0[0], port=self.ua.rAddr0[1])
+            self.ua.rUri = SipTo(address=SipAddress(url=self.ua.rTarget.getCopy(), hadbrace=True))
             if self.ua.ruri_userparams != None:
                 self.ua.rTarget.userparams = self.ua.ruri_userparams
             self.ua.rUri.getUrl().port = None
             if self.ua.to_username != None:
                 self.ua.rUri.getUrl().username = self.ua.to_username
-            self.ua.lUri = SipFrom(address = SipAddress(url = SipURL(username = callingID), hadbrace = True, name = callingName))
+            self.ua.lUri = SipFrom(address=SipAddress(url=SipURL(username=callingID), hadbrace=True, name=callingName))
             self.ua.lUri.getUrl().port = None
             if self.ua.from_domain != None:
                 self.ua.lUri.getUrl().host = self.ua.from_domain
@@ -73,11 +74,12 @@ class UacStateIdle(UaStateGeneric):
             self.ua.routes = []
             self.ua.cGUID = cGUID
             self.ua.lSDP = body
-            req = self.ua.genRequest('INVITE', body, reason = event.reason, \
-              max_forwards = event.max_forwards)
+            req = self.ua.genRequest('INVITE', body, reason=event.reason, \
+                                     max_forwards=event.max_forwards)
             self.ua.lCSeq += 1
             self.ua.tr = self.ua.global_config['_sip_tm'].newTransaction(req, self.ua.recvResponse, \
-              laddress = self.ua.source_address, cb_ifver = 2, compact = self.ua.compact_sip)
+                                                                         laddress=self.ua.source_address, cb_ifver=2,
+                                                                         compact=self.ua.compact_sip)
             self.ua.auth = None
             if self.ua.expire_time != None:
                 self.ua.expire_time += event.rtime
@@ -93,7 +95,7 @@ class UacStateIdle(UaStateGeneric):
                     elif self.ua.no_progress_time != None and self.ua.no_reply_time >= self.ua.no_progress_time:
                         self.ua.no_reply_time = None
                 else:
-                        self.ua.no_reply_time = None
+                    self.ua.no_reply_time = None
             if self.ua.no_reply_time != None:
                 self.ua.no_reply_timer = TimeoutAbs(self.ua.no_reply_expires, self.ua.no_reply_time)
             elif self.ua.no_progress_time != None:
@@ -104,6 +106,7 @@ class UacStateIdle(UaStateGeneric):
         if isinstance(event, CCEventFail) or isinstance(event, CCEventRedirect) or isinstance(event, CCEventDisconnect):
             return (UaStateDead, self.ua.disc_cbs, event.rtime, event.origin)
         return None
+
 
 if not globals().has_key('UacStateTrying'):
     from UacStateTrying import UacStateTrying

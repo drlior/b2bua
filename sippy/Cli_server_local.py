@@ -30,10 +30,11 @@ from Cli_session import Cli_session
 from os import chown, unlink
 from os.path import exists
 
+
 class Cli_server_local(Factory):
     command_cb = None
 
-    def __init__(self, command_cb, address = None, sock_owner = None):
+    def __init__(self, command_cb, address=None, sock_owner=None):
         self.command_cb = command_cb
         self.protocol = Cli_session
         if address == None:
@@ -49,9 +50,12 @@ class Cli_server_local(Factory):
         p.command_cb = self.command_cb
         return p
 
+
 if __name__ == '__main__':
     def callback(clm, cmd):
         print cmd
         return False
+
+
     f = Cli_server_local(callback)
     reactor.run()

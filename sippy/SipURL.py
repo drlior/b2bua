@@ -27,6 +27,7 @@
 from SipConf import SipConf
 from urllib import quote, unquote
 
+
 class SipURL(object):
     username = None
     userparams = None
@@ -43,9 +44,9 @@ class SipURL(object):
     other = None
     lr = False
 
-    def __init__(self, url = None, username = None, password = None, host = None, port = None, headers = None, \
-      usertype = None, transport = None, ttl = None, maddr = None, method = None, tag = None, other = None, \
-      userparams = None, lr = False, relaxedparser = False):
+    def __init__(self, url=None, username=None, password=None, host=None, port=None, headers=None, \
+                 usertype=None, transport=None, ttl=None, maddr=None, method=None, tag=None, other=None, \
+                 userparams=None, lr=False, relaxedparser=False):
         self.other = []
         self.userparams = []
         if url == None:
@@ -161,8 +162,9 @@ class SipURL(object):
     def __str__(self):
         return self.localStr()
 
-    def localStr(self, local_addr = None, local_port = None):
-        l = []; w = l.append
+    def localStr(self, local_addr=None, local_port=None):
+        l = [];
+        w = l.append
         w('sip:')
         if self.username != None:
             w(self.username)
@@ -196,10 +198,10 @@ class SipURL(object):
         return ''.join(l)
 
     def getCopy(self):
-        return SipURL(username = self.username, password = self.password, host = self.host, port = self.port, \
-          headers = self.headers, usertype = self.usertype, transport = self.transport, ttl = self.ttl, \
-          maddr = self.maddr, method = self.method, tag = self.tag, other = list(self.other), \
-          userparams = list(self.userparams), lr = self.lr)
+        return SipURL(username=self.username, password=self.password, host=self.host, port=self.port, \
+                      headers=self.headers, usertype=self.usertype, transport=self.transport, ttl=self.ttl, \
+                      maddr=self.maddr, method=self.method, tag=self.tag, other=list(self.other), \
+                      userparams=list(self.userparams), lr=self.lr)
 
     def getHost(self):
         return self.host

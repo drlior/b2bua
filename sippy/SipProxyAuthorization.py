@@ -26,8 +26,9 @@
 
 from SipAuthorization import SipAuthorization
 
+
 class SipProxyAuthorization(SipAuthorization):
     hf_names = ('proxy-authorization',)
 
-    def getCanName(self, name, compact = False):
+    def getCanName(self, name, compact=False):
         return 'Proxy-Authorization'

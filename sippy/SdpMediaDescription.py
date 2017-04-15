@@ -28,8 +28,9 @@ from SdpConnecton import SdpConnecton
 from SdpMedia import SdpMedia
 from SdpGeneric import SdpGeneric
 
-f_types = {'m':SdpMedia, 'i':SdpGeneric, 'c':SdpConnecton, 'b':SdpGeneric, \
-  'k':SdpGeneric}
+f_types = {'m': SdpMedia, 'i': SdpGeneric, 'c': SdpConnecton, 'b': SdpGeneric, \
+           'k': SdpGeneric}
+
 
 class SdpMediaDescription(object):
     m_header = None
@@ -41,7 +42,7 @@ class SdpMediaDescription(object):
     all_headers = ('m', 'i', 'c', 'b', 'k')
     needs_update = True
 
-    def __init__(self, cself = None):
+    def __init__(self, cself=None):
         if cself != None:
             for header_name in [x + '_header' for x in self.all_headers]:
                 try:
@@ -62,7 +63,7 @@ class SdpMediaDescription(object):
             s += 'a=%s\r\n' % str(header)
         return s
 
-    def localStr(self, local_addr = None, local_port = None, noC = False):
+    def localStr(self, local_addr=None, local_port=None, noC=False):
         s = ''
         for name in self.all_headers:
             if noC and name == 'c':
@@ -79,7 +80,7 @@ class SdpMediaDescription(object):
         return self
 
     def getCopy(self):
-        return SdpMediaDescription(cself = self)
+        return SdpMediaDescription(cself=self)
 
     def addHeader(self, name, header):
         if name == 'a':
